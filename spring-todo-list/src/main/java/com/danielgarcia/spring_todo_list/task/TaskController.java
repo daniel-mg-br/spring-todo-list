@@ -1,5 +1,6 @@
 package com.danielgarcia.spring_todo_list.task;
 
+import com.danielgarcia.spring_todo_list.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,5 +47,26 @@ public class TaskController {
     public List<TaskModel> userTasks(HttpServletRequest request) {
         var userId = request.getAttribute("userId");
         return taskRepository.findByUserId((UUID) userId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity update(@RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
+        var task = taskRepository.findById(id).orElse(null);
+        var userId = request.getAttribute("userId");
+
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Tarefa não encontrada!");
+        }
+
+        if (!task.getUserId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Usuário não tem permissão!");
+        }
+
+        Utils.copyNonNullProperties(taskModel, task);
+
+        var taskUpdated = taskRepository.save(task);
+        return ResponseEntity.ok().body(taskUpdated);
     }
 }
