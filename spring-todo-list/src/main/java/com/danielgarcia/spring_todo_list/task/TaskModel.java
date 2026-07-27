@@ -35,4 +35,12 @@ public class TaskModel {
     private LocalDateTime endAt;
 
     private UUID userId;
+
+    public void setTitle(String title) throws Exception {
+        if (title.length() > 50) {
+            throw new Exception("Palavra muito grande! (MAX 50)");
+        }
+        this.title = title;
+    }
+
 }

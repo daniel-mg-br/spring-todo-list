@@ -2,6 +2,7 @@ package com.danielgarcia.spring_todo_list.task;
 
 import com.danielgarcia.spring_todo_list.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class TaskController {
     private ITaskRepository taskRepository;
 
     @PostMapping("/")
-    public ResponseEntity createTask(@RequestBody TaskModel task, HttpServletRequest request) {
+    public ResponseEntity createTask(@Valid @RequestBody TaskModel task, HttpServletRequest request) {
         var userId = request.getAttribute("userId");
         task.setUserId((UUID) userId);
 
@@ -40,7 +41,7 @@ public class TaskController {
         }
 
         var taskCreated = taskRepository.save(task);
-        return ResponseEntity.status(HttpStatus.OK).body(taskCreated);
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskCreated);
     }
 
     @GetMapping("/")
@@ -50,7 +51,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity update(@RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
+    public ResponseEntity update(@Valid @RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
         var task = taskRepository.findById(id).orElse(null);
         var userId = request.getAttribute("userId");
 
