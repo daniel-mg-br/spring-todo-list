@@ -2,15 +2,15 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copia apenas o pom.xml primeiro (otimiza o cache do Docker)
+# Copia apenas o pom.xml e a pasta src
 COPY pom.xml .
 COPY src ./src
 
 # Roda o build (ignorando testes para acelerar o deploy)
 RUN mvn clean install -DskipTests
 
-# Estágio 2: Execução (Imagem mais leve apenas com o Java 21)
-FROM eclipse-temurin:21-jdk-slim
+# Estágio 2: Execução (Imagem corrigida: usa o JRE no Ubuntu Jammy)
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 EXPOSE 8080
